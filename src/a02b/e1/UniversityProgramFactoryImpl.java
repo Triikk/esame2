@@ -50,8 +50,8 @@ public class UniversityProgramFactoryImpl implements UniversityProgramFactory {
         };
     }
 
-    private UniversityProgram generalCaller(Set<Set<Sector>> allSectors, Map<Set<Sector>, Pair<Integer, ComparationMethod>> expected){
-        return general(allSectors, actual -> {
+    private UniversityProgram generalCaller(Map<Set<Sector>, Pair<Integer, ComparationMethod>> expected){
+        return general(expected.keySet(), actual -> {
             Set<Sector> sectors = actual.get1();
             Integer actualSum = actual.get2();
             Integer expectedSum = expected.get(sectors).get1();
@@ -69,8 +69,7 @@ public class UniversityProgramFactoryImpl implements UniversityProgramFactory {
     public UniversityProgram flexible() {
         Map<Set<Sector>, Pair<Integer, ComparationMethod>> expected = new HashMap<>();
         expected.put(Set.of(Sector.values()), new Pair<>(60, ComparationMethod.EQUAL));
-        Set<Set<Sector>> sectors = expected.keySet();
-        return generalCaller(sectors, expected);
+        return generalCaller(expected);
     }
 
     @Override
@@ -80,8 +79,7 @@ public class UniversityProgramFactoryImpl implements UniversityProgramFactory {
         expected.put(Set.of(Sector.COMPUTER_SCIENCE), new Pair<>(12, ComparationMethod.GREATER_OR_EQUAL));
         expected.put(Set.of(Sector.PHYSICS), new Pair<>(12, ComparationMethod.GREATER_OR_EQUAL));
         expected.put(Set.of(Sector.MATHEMATICS), new Pair<>(12, ComparationMethod.GREATER_OR_EQUAL));
-        Set<Set<Sector>> sectors = expected.keySet();
-        return generalCaller(sectors, expected);
+        return generalCaller(expected);
     }
 
     @Override
@@ -89,8 +87,7 @@ public class UniversityProgramFactoryImpl implements UniversityProgramFactory {
         Map<Set<Sector>, Pair<Integer, ComparationMethod>> expected = new HashMap<>();
         expected.put(Set.of(Sector.values()), new Pair<>(48, ComparationMethod.GREATER_OR_EQUAL));
         expected.put(Set.of(Sector.COMPUTER_ENGINEERING, Sector.COMPUTER_SCIENCE), new Pair<>(30, ComparationMethod.GREATER_OR_EQUAL));
-        Set<Set<Sector>> sectors = expected.keySet();
-        return generalCaller(sectors, expected);
+        return generalCaller(expected);
     }
 
     @Override
@@ -100,7 +97,6 @@ public class UniversityProgramFactoryImpl implements UniversityProgramFactory {
         expected.put(Set.of(Sector.COMPUTER_ENGINEERING, Sector.COMPUTER_SCIENCE), new Pair<>(60, ComparationMethod.GREATER_OR_EQUAL));
         expected.put(Set.of(Sector.MATHEMATICS, Sector.PHYSICS), new Pair<>(18, ComparationMethod.LESS_OR_EQUAL));
         expected.put(Set.of(Sector.THESIS), new Pair<>(24, ComparationMethod.EQUAL));
-        Set<Set<Sector>> sectors = expected.keySet();
-        return generalCaller(sectors, expected);
+        return generalCaller(expected);
     }
 }
