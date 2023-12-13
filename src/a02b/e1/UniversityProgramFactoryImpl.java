@@ -13,6 +13,12 @@ import a02b.e1.UniversityProgram.Sector;
 
 public class UniversityProgramFactoryImpl implements UniversityProgramFactory {
 
+    private enum ComparationMethod {
+        EQUAL,
+        GREATER_OR_EQUAL,
+        LESS_OR_EQUAL
+    };
+
     private UniversityProgram general(Set<Set<Sector>> sectors, Predicate<Pair<Set<Sector>, Integer>> pred){
         return new UniversityProgram() {
 
@@ -47,87 +53,79 @@ public class UniversityProgramFactoryImpl implements UniversityProgramFactory {
         };
     }
 
+    private UniversityProgram generalCaller(Set<Set<Sector>> sectors, Map<Set<Sector>, Pair<Integer, ComparationMethod>> comparation){
+        return general(sectors, pair -> {
+            Set<Sector> sectorSet = pair.get1();
+            Integer sum = pair.get2();
+            Integer expectedSum = comparation.get(sectorSet).get1();
+            ComparationMethod comparationMethod = comparation.get(sectorSet).get2();
+            switch (comparationMethod) {
+                case EQUAL: return sum == expectedSum;
+                case GREATER_OR_EQUAL: return sum >= expectedSum;
+                case LESS_OR_EQUAL: return sum <= expectedSum;
+                default: throw new IllegalStateException();
+            }
+        });
+    }
+
     @Override
     public UniversityProgram flexible() {
         Set<Set<Sector>> sectors = new HashSet<>();
-        Set<Sector> allSectors = Set.of(Sector.values());
-        sectors.add(allSectors);
-        return general(sectors, (pair) -> pair.get2() == 60);
+        Set<Sector> all = Set.of(Sector.values());
+        sectors.add(all);
+        Map<Set<Sector>, Pair<Integer, ComparationMethod>> sectorsToExpectedSums = new HashMap<>();
+        sectorsToExpectedSums.put(all, new Pair<>(60, ComparationMethod.EQUAL));
+        return generalCaller(sectors, sectorsToExpectedSums);
     }
 
     @Override
     public UniversityProgram scientific() {
         Set<Set<Sector>> sectors = new HashSet<>();
-        Set<Sector> allSectors = Set.of(Sector.values());
-        Set<Sector> mathSectors = Set.of(Sector.MATHEMATICS);
-        Set<Sector> physicsSectors = Set.of(Sector.PHYSICS);
-        Set<Sector> computerScienceSectors = Set.of(Sector.COMPUTER_SCIENCE);
-        sectors.add(allSectors);
-        sectors.add(mathSectors);
-        sectors.add(physicsSectors);
-        sectors.add(computerScienceSectors);
-        return general(sectors, pair -> {
-            Set<Sector> sector = pair.get1();
-            Integer sum = pair.get2();
-            System.out.println(sum);
-            if(sector.equals(allSectors)){
-                return sum == 60;
-            } else if(sector.equals(mathSectors) || sector.equals(physicsSectors) || sector.equals(computerScienceSectors)) {
-                return sum >= 12;
-            } else {
-                throw new IllegalStateException();
-            }
-        });
+        Set<Sector> all = Set.of(Sector.values());
+        Set<Sector> compSci = Set.of(Sector.COMPUTER_SCIENCE);
+        Set<Sector> physics = Set.of(Sector.PHYSICS);
+        Set<Sector> math = Set.of(Sector.MATHEMATICS);
+        sectors.add(all);
+        sectors.add(compSci);
+        sectors.add(physics);
+        sectors.add(math);
+        Map<Set<Sector>, Pair<Integer, ComparationMethod>> sectorsToExpectedSums = new HashMap<>();
+        sectorsToExpectedSums.put(all, new Pair<>(60, ComparationMethod.EQUAL));
+        sectorsToExpectedSums.put(compSci, new Pair<>(12, ComparationMethod.GREATER_OR_EQUAL));
+        sectorsToExpectedSums.put(physics, new Pair<>(12, ComparationMethod.GREATER_OR_EQUAL));
+        sectorsToExpectedSums.put(math, new Pair<>(12, ComparationMethod.GREATER_OR_EQUAL));
+        return generalCaller(sectors, sectorsToExpectedSums);
     }
 
     @Override
     public UniversityProgram shortComputerScience() {
         Set<Set<Sector>> sectors = new HashSet<>();
-        Set<Sector> allSectors = Set.of(Sector.values());
-        Set<Sector> computerScienceSectors = Set.of(Sector.COMPUTER_SCIENCE, COMPUTER_ENGINEERING);
-        sectors.add(allSectors);
-        sectors.add(computerScienceSectors);
-        return general(sectors, pair -> {
-            Set<Sector> sector = pair.get1();
-            Integer sum = pair.get2();
-            System.out.println(sum);
-            if(sector.equals(allSectors)){
-                return sum >= 48;
-            } else if(sector.equals(computerScienceSectors)) {
-                return sum >= 30;
-            } else {
-                throw new IllegalStateException();
-            }
-        });
+        Set<Sector> all = Set.of(Sector.values());
+        Set<Sector> compSci = Set.of(Sector.COMPUTER_ENGINEERING, Sector.COMPUTER_SCIENCE);
+        sectors.add(all);
+        sectors.add(compSci);
+        Map<Set<Sector>, Pair<Integer, ComparationMethod>> sectorsToExpectedSums = new HashMap<>();
+        sectorsToExpectedSums.put(all, new Pair<>(48, ComparationMethod.GREATER_OR_EQUAL));
+        sectorsToExpectedSums.put(compSci, new Pair<>(30, ComparationMethod.GREATER_OR_EQUAL));
+        return generalCaller(sectors, sectorsToExpectedSums);
     }
 
     @Override
     public UniversityProgram realistic() {
         Set<Set<Sector>> sectors = new HashSet<>();
-        Set<Sector> allSectors = Set.of(Sector.values());
-        Set<Sector> computerScienceSectors = Set.of(Sector.COMPUTER_SCIENCE, COMPUTER_ENGINEERING);
-        Set<Sector> mathPhysicsSectors = Set.of(Sector.MATHEMATICS, Sector.PHYSICS);
-        Set<Sector> thesisSectors = Set.of(Sector.THESIS);
-        sectors.add(allSectors);
-        sectors.add(computerScienceSectors);
-        sectors.add(mathPhysicsSectors);
-        sectors.add(thesisSectors);
-        return general(sectors, pair -> {
-            Set<Sector> sector = pair.get1();
-            Integer sum = pair.get2();
-            System.out.println(sum);
-            if(sector.equals(allSectors)){
-                return sum == 120;
-            } else if(sector.equals(computerScienceSectors)) {
-                return sum >= 60;
-            } else if(sector.equals(mathPhysicsSectors)) {
-                return sum <= 18;
-            } else if(sector.equals(thesisSectors)) {
-                return sum == 24;
-            } else {
-                throw new IllegalStateException();
-            }
-        });
+        Set<Sector> all = Set.of(Sector.values());
+        Set<Sector> compSci = Set.of(Sector.COMPUTER_ENGINEERING, Sector.COMPUTER_SCIENCE);
+        Set<Sector> mathPhys = Set.of(Sector.MATHEMATICS, Sector.PHYSICS);
+        Set<Sector> thesis = Set.of(Sector.THESIS);
+        sectors.add(all);
+        sectors.add(compSci);
+        sectors.add(mathPhys);
+        sectors.add(thesis);
+        Map<Set<Sector>, Pair<Integer, ComparationMethod>> sectorsToExpectedSums = new HashMap<>();
+        sectorsToExpectedSums.put(all, new Pair<>(120, ComparationMethod.EQUAL));
+        sectorsToExpectedSums.put(compSci, new Pair<>(60, ComparationMethod.GREATER_OR_EQUAL));
+        sectorsToExpectedSums.put(mathPhys, new Pair<>(18, ComparationMethod.LESS_OR_EQUAL));
+        sectorsToExpectedSums.put(thesis, new Pair<>(24, ComparationMethod.EQUAL));
+        return generalCaller(sectors, sectorsToExpectedSums);
     }
-
 }
